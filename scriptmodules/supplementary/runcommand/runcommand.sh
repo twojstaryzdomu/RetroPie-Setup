@@ -79,7 +79,11 @@
 
 ROOTDIR="/opt/retropie"
 CONFIGDIR="$ROOTDIR/configs"
-LOG="/dev/shm/runcommand.log"
+OUTPUTDIR="/dev/shm"
+[ -d "${OUTPUTDIR}" ] \
+  && [ -w "${OUTPUTDIR}" ] \
+    || OUTPUTDIR=/tmp
+LOG="${OUTPUTDIR}/runcommand.log"
 
 RUNCOMMAND_CONF="$CONFIGDIR/all/runcommand.cfg"
 VIDEO_CONF="$CONFIGDIR/all/videomodes.cfg"
@@ -929,7 +933,7 @@ function switch_fb_res() {
 
 function build_xinitrc() {
     local mode="$1"
-    local xinitrc="/dev/shm/retropie_xinitrc"
+    local xinitrc="${OUTPUTDIR}/retropie_xinitrc"
 
     case "$mode" in
         clear)
@@ -1069,7 +1073,7 @@ function config_backend() {
 }
 
 function retroarch_append_config() {
-    local conf="/dev/shm/retroarch.cfg"
+    local conf="${OUTPUTDIR}/retroarch.cfg"
     local dim
 
     # only for retroarch emulators
@@ -1318,7 +1322,7 @@ function launch_command() {
 }
 
 function log_info() {
-    echo -e "$SYSTEM\n$EMULATOR\n$ROM\n$COMMAND" >/dev/shm/runcommand.info
+    echo -e "$SYSTEM\n$EMULATOR\n$ROM\n$COMMAND" >${OUTPUTDIR}/runcommand.info
 }
 
 function runcommand() {
