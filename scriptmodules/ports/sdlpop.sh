@@ -23,6 +23,15 @@ function sources_sdlpop() {
     gitPullOrClone
 }
 
+function install_bin_sdlpop {
+    aptInstall "sdlpop"
+}
+
+function _update_hook_sdlpop () {
+    # to show as installed in retropie-setup 4.x
+    hasPackage "sdlpop" && mkdir -p "$md_inst"
+}
+
 function build_sdlpop() {
     cd src
     make
@@ -40,8 +49,18 @@ function install_sdlpop() {
     sed -i "s/use_correct_aspect_ratio = false/use_correct_aspect_ratio = true/" "$md_inst/SDLPoP.ini.def"
 }
 
+function remove_sdlpop() {
+    aptRemove "sdlpop"
+    rm $romdir/ports/"Prince of Persia.sh"
+}
+
 function configure_sdlpop() {
-    addPort "$md_id" "sdlpop" "Prince of Persia" "pushd $md_inst; $md_inst/prince full; popd"
+    typeset cmd
+    dpkg -s sdlpop >/dev/null 2>&1 \
+        && cmd="prince" \
+        || cmd="pushd $md_inst; $md_inst/prince full; popd"
+
+    addPort "$md_id" "sdlpop" "Prince of Persia" "$cmd"
 
     [[ "$md_mode" == "remove" ]] && return
 
