@@ -123,7 +123,9 @@ function updatescript_setup()
     if ! error=$(sudo -u "$user" git pull --ff-only 2>&1 >/dev/null); then
         printMsgs "dialog" "Update failed:\n\n$error"
         popd >/dev/null
-        return 1
+        [ -n "$IAMSURE" ] \
+            && return 0 \
+            || return 1
     fi
     popd >/dev/null
 
