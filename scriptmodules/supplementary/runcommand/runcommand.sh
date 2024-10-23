@@ -127,6 +127,9 @@ function get_config() {
         LOG_DIR="$ini_value"
         [[ -d "$LOG_DIR" ]] && LOG_DIR="/dev/shm"
         LOG="$LOG_DIR/runcommand.log"
+        iniGet "legacy_joy2key"
+        LEGACY_JOY2KEY="$ini_value"
+        [[ -z "$LEGACY_JOY2KEY" ]] && LEGACY_JOY2KEY=0
     fi
 
     if [[ -n "$DISPLAY" ]] && $XRANDR &>/dev/null; then
@@ -1263,6 +1266,9 @@ function show_launch() {
             feh -F -N -Z -Y -q "$image" & &>/dev/null
             IMG_PID=$!
             sleep "$IMAGE_DELAY"
+            # if we're not using the old Joy2Key script, we need feh to stop after the delay
+            # otherwise the menu will not be triggered due to terminal being out of focus
+            [[ "$LEGACY_JOY2KEY" -eq 0 && "DISABLE_MENU" -ne 1 ]] && kill -SIGINT "$IMG_PID"
         else
             fbi -1 -t "$IMAGE_DELAY" -noverbose -a "$image" </dev/tty &>/dev/null
         fi
